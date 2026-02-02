@@ -1,33 +1,9 @@
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+// FIX: Import keys from the central config instead of generating them here.
+// This prevents the "EEXIST" (Folder already exists) crash.
+const { publicKey, privateKey } = require('../config/keys');
 
-// --- 1. RSA Key Management (Key Exchange Mechanism) ---
-// Keys are generated once and saved to disk to simulate a persistent secure keystore.
-const PUBLIC_KEY_PATH = path.join(__dirname, '../keys/public.pem');
-const PRIVATE_KEY_PATH = path.join(__dirname, '../keys/private.pem');
-
-if (!fs.existsSync('../keys')) fs.mkdirSync(path.join(__dirname, '../keys'));
-
-let publicKey, privateKey;
-
-if (!fs.existsSync(PRIVATE_KEY_PATH)) {
-    const keys = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 2048,
-        publicKeyEncoding: { type: 'spki', format: 'pem' },
-        privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    });
-    fs.writeFileSync(PUBLIC_KEY_PATH, keys.publicKey);
-    fs.writeFileSync(PRIVATE_KEY_PATH, keys.privateKey);
-    publicKey = keys.publicKey;
-    privateKey = keys.privateKey;
-    console.log("⚠️ NEW RSA KEYS GENERATED");
-} else {
-    publicKey = fs.readFileSync(PUBLIC_KEY_PATH, 'utf8');
-    privateKey = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
-}
-
-// --- 2. AES Encryption (Symmetric) for Files ---
+// --- 1. AES Encryption (Symmetric) for Files ---
 exports.encryptFileBuffer = (buffer) => {
     // Generate fresh AES key and IV for EVERY file (NIST Requirement)
     const aesKey = crypto.randomBytes(32); // 256 bits
@@ -48,9 +24,8 @@ exports.decryptFileBuffer = (encryptedBuffer, aesKey, iv) => {
     return Buffer.concat([decipher.update(encryptedBuffer), decipher.final()]);
 };
 
-// --- 3. RSA Key Wrapping (Hybrid Encryption) ---
+// --- 2. RSA Key Wrapping (Hybrid Encryption) ---
 // We encrypt the AES key with the Server's Public Key.
-// Only the Server (holding Private Key) can unwrap it.
 exports.wrapKey = (aesKeyBuffer) => {
     return crypto.publicEncrypt(publicKey, aesKeyBuffer).toString('base64');
 };
@@ -60,7 +35,7 @@ exports.unwrapKey = (wrappedKeyBase64) => {
     return crypto.privateDecrypt(privateKey, buffer);
 };
 
-// --- 4. Digital Signatures (Authenticity) ---
+// --- 3. Digital Signatures (Authenticity) ---
 exports.createSignature = (data) => {
     const sign = crypto.createSign('SHA256');
     sign.update(data);
