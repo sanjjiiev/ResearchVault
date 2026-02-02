@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FileText, Download, Clock, PenTool } from 'lucide-react';
+import { FileText, Download, Clock, PenTool, Plus } from 'lucide-react';
 import api from '../api';
 import ReviewModal from '../components/ReviewModal';
 import AdminControls from '../components/AdminControls';
+import UploadModal from '../components/UploadModal';
 
 export default function Dashboard() {
   const [papers, setPapers] = useState([]);
@@ -11,6 +12,7 @@ export default function Dashboard() {
   const [userRole] = useState(() => localStorage.getItem('role') || 'student');
   
   const [selectedPaper, setSelectedPaper] = useState(null); 
+  const [showUpload, setShowUpload] = useState(false);
 
   // Fetch Papers
   const fetchPapers = useCallback(async () => {
@@ -43,9 +45,17 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold text-white mb-6">
-        {userRole === 'admin' ? 'Admin Control Center' : userRole === 'faculty' ? 'Review Dashboard' : 'My Research'}
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-white">
+          {userRole === 'admin' ? 'Admin Control Center' : userRole === 'faculty' ? 'Review Dashboard' : 'My Research'}
+        </h1>
+        {userRole === 'student' && (
+          <button onClick={() => setShowUpload(true)} className="flex items-center space-x-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg transition">
+            <Plus size={20} />
+            <span>Upload Paper</span>
+          </button>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {papers.map((paper) => (
@@ -105,6 +115,14 @@ export default function Dashboard() {
           paperId={selectedPaper} 
           onClose={() => setSelectedPaper(null)} 
           onSuccess={fetchPapers} 
+        />
+      )}
+
+      {/* Upload Modal */}
+      {showUpload && (
+        <UploadModal 
+          onClose={() => setShowUpload(false)}
+          onSuccess={fetchPapers}
         />
       )}
     </div>
