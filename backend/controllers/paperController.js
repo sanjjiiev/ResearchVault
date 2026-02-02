@@ -63,6 +63,9 @@ exports.listPapers = async (req, res) => {
         // Access Control: Students see own, Faculty see assigned (mocked as all for now), Admin sees all
         if (role === 'student') {
             query = query.eq('author_id', id);
+        } else if (role === 'admin') {
+            // Admin sees all papers AND their reviews
+            query = supabase.from('papers').select('*, profiles(full_name), reviews(*)');
         }
 
         const { data, error } = await query;

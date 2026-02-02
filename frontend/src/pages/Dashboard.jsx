@@ -1,21 +1,31 @@
-import { useEffect, useState } from 'react';
-import { FileText, Download, Clock } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { FileText, Download, Clock, PenTool } from 'lucide-react';
 import api from '../api';
+import ReviewModal from '../components/ReviewModal';
+import AdminControls from '../components/AdminControls';
 
 export default function Dashboard() {
   const [papers, setPapers] = useState([]);
+  
+  // FIX 1: Initialize role directly from localStorage to prevent cascading renders
+  const [userRole] = useState(() => localStorage.getItem('role') || 'student');
+  
+  const [selectedPaper, setSelectedPaper] = useState(null); 
 
-  useEffect(() => {
-    const fetchPapers = async () => {
-      try {
-        const res = await api.get('/papers');
-        setPapers(res.data);
-      } catch  {
-        console.error("Failed to fetch papers");
-      }
-    };
-    fetchPapers();
+  // Fetch Papers
+  const fetchPapers = useCallback(async () => {
+    try {
+      const res = await api.get('/papers');
+      setPapers(res.data);
+    } catch (err) {
+      console.error("Failed to fetch papers", err);
+    }
   }, []);
+
+  // FIX 2: useEffect now only handles data fetching, not role setting
+  useEffect(() => {
+    fetchPapers();
+  }, [fetchPapers]);
 
   const handleDownload = async (id, title) => {
     try {
@@ -27,54 +37,91 @@ export default function Dashboard() {
       document.body.appendChild(link);
       link.click();
     } catch  {
-      alert("Decryption Failed!");
+      alert("Decryption Failed or Access Denied!");
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold text-white mb-6">Research Dashboard</h1>
+      <h1 className="text-3xl font-bold text-white mb-6">
+        {userRole === 'admin' ? 'Admin Control Center' : userRole === 'faculty' ? 'Review Dashboard' : 'My Research'}
+      </h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {papers.map((paper) => (
-          <div key={paper.id} className="glass p-6 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-all group">
+          <div key={paper.id} className="glass p-6 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-all flex flex-col">
+            
+            {/* Header */}
             <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-slate-800 rounded-lg text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+              <div className="p-3 bg-slate-800 rounded-lg text-cyan-400">
                 <FileText size={24} />
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                paper.status === 'accepted' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
-              }`}>
-                {paper.status || 'Submitted'}
-              </span>
+              <Badge status={paper.status} />
             </div>
 
+            {/* Content */}
             <h3 className="text-xl font-bold text-white mb-2 line-clamp-1">{paper.title}</h3>
-            <p className="text-slate-400 text-sm mb-4 line-clamp-2">{paper.abstract}</p>
+            <p className="text-slate-400 text-sm mb-4 line-clamp-2 flex-grow">{paper.abstract}</p>
+            <div className="text-xs text-slate-500 mb-4 flex items-center">
+               <Clock size={12} className="mr-1"/> {new Date(paper.created_at).toLocaleDateString()}
+               <span className="ml-auto text-cyan-500">Author: {paper.profiles?.full_name || 'Unknown'}</span>
+            </div>
 
-            <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
-              <div className="flex items-center text-slate-500 text-xs">
-                <Clock size={14} className="mr-1" />
-                {new Date(paper.created_at).toLocaleDateString()}
-              </div>
+            {/* Actions Footer */}
+            <div className="mt-auto pt-4 border-t border-slate-800 space-y-3">
               
+              {/* Common: Download Button */}
               <button 
                 onClick={() => handleDownload(paper.id, paper.title)}
-                className="flex items-center space-x-2 text-sm text-cyan-400 hover:text-cyan-300 font-medium"
+                className="w-full flex items-center justify-center space-x-2 text-sm bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-lg transition"
               >
                 <Download size={16} />
                 <span>Decrypt & Download</span>
               </button>
+
+              {/* Faculty Action: Review Button */}
+              {userRole === 'faculty' && paper.status !== 'accepted' && paper.status !== 'rejected' && (
+                <button 
+                  onClick={() => setSelectedPaper(paper.id)}
+                  className="w-full flex items-center justify-center space-x-2 text-sm bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded-lg transition"
+                >
+                  <PenTool size={16} />
+                  <span>Submit Review</span>
+                </button>
+              )}
+
+              {/* Admin Action: Decision Controls */}
+              {userRole === 'admin' && (
+                 <AdminControls paperId={paper.id} onSuccess={fetchPapers} />
+              )}
             </div>
           </div>
         ))}
-        
-        {papers.length === 0 && (
-          <div className="col-span-full text-center py-12 text-slate-500">
-            No research papers found. Upload one to get started.
-          </div>
-        )}
       </div>
+
+      {/* Review Modal Popup */}
+      {selectedPaper && (
+        <ReviewModal 
+          paperId={selectedPaper} 
+          onClose={() => setSelectedPaper(null)} 
+          onSuccess={fetchPapers} 
+        />
+      )}
     </div>
+  );
+}
+
+// Simple Badge Component for Status
+function Badge({ status }) {
+  const colors = {
+    submitted: 'bg-blue-500/20 text-blue-400',
+    under_review: 'bg-yellow-500/20 text-yellow-400',
+    accepted: 'bg-green-500/20 text-green-400',
+    rejected: 'bg-red-500/20 text-red-400'
+  };
+  return (
+    <span className={`text-xs font-bold px-2 py-1 rounded-full uppercase ${colors[status] || colors.submitted}`}>
+      {status?.replace('_', ' ') || 'Submitted'}
+    </span>
   );
 }

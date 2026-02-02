@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, Shield, User } from 'lucide-react';
+import { Lock, Mail, Shield, User, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api';
 
 export default function Login() {
   const [isRegister, setIsRegister] = useState(false); // Toggle Login/Register
   const [step, setStep] = useState(1); 
+  
+  // Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [otp, setOtp] = useState('');
-  const [userId, setUserId] = useState(null);
   
-  // FIX: Added tempToken state to store the token from Step 1
+  // Temporary Storage for Multi-Step Process
+  const [userId, setUserId] = useState(null);
   const [tempToken, setTempToken] = useState(null);
+  const [tempRole, setTempRole] = useState(null);
   
   const navigate = useNavigate();
 
@@ -30,35 +33,38 @@ export default function Login() {
     }
   };
 
-  // Handle Login Step 1
+  // Handle Login Step 1 (Password)
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post('/auth/login', { email, password });
+      
+      // Capture data from backend
       setUserId(res.data.userId);
+      setTempToken(res.data.tempToken); // Store Token
+      setTempRole(res.data.role);       // Store Role (admin/faculty)
       
-      // FIX: Capture the token sent from backend
-      setTempToken(res.data.tempToken);
-      
-      setStep(2);
-      toast.success("Check email for OTP.");
-    } catch  {
+      setStep(2); // Move to OTP screen
+      toast.success("Credentials valid. Check email for OTP.");
+    } catch {
       toast.error("Invalid credentials");
     }
   };
 
-  // Handle Login Step 2 (MFA)
+  // Handle Login Step 2 (MFA OTP)
   const handleMFA = async (e) => {
     e.preventDefault();
     try {
-      // 1. Verify OTP
+      // Verify OTP
       await api.post('/auth/verify-otp', { userId, otp });
 
-      // 2. If successful, save the token we got in Step 1
-      if (tempToken) {
+      // Save Token & Role to LocalStorage (Persist Session)
+      if (tempToken && tempRole) {
         localStorage.setItem('token', tempToken);
+        localStorage.setItem('role', tempRole);
+        
         navigate('/dashboard');
-        toast.success("Secure Access Granted.");
+        toast.success(`Welcome back, ${tempRole.toUpperCase()}!`);
       } else {
         toast.error("Session missing. Please login again.");
         setStep(1);
@@ -73,59 +79,89 @@ export default function Login() {
       <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
 
       <div className="relative z-10 w-full max-w-md p-8 glass rounded-2xl shadow-2xl border border-slate-700">
+        
+        {/* Header */}
         <div className="text-center mb-6">
+          <div className="bg-cyan-500/20 p-3 rounded-full w-14 h-14 mx-auto flex items-center justify-center mb-4 text-cyan-400">
+            <Shield size={28} />
+          </div>
           <h2 className="text-3xl font-bold text-white">ResearchVault</h2>
-          <p className="text-slate-400 mt-2">{isRegister ? "Create Account" : "Secure Login"}</p>
+          <p className="text-slate-400 mt-2 text-sm uppercase tracking-widest">
+            {isRegister ? "Create Account" : step === 1 ? "Secure Login" : "Multi-Factor Auth"}
+          </p>
         </div>
 
-        {/* REMOVED AnimatePresence and motion.form */}
+        {/* FORMS */}
         {isRegister ? (
-          // REGISTER FORM
+          // --- REGISTER FORM ---
           <form onSubmit={handleRegister} className="space-y-4">
             <Input icon={<User />} placeholder="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} />
-            <Input icon={<Mail />} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+            <Input icon={<Mail />} type="email" placeholder="University Email" value={email} onChange={e => setEmail(e.target.value)} />
             <Input icon={<Lock />} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-            <Button text="Sign Up" />
-            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400" onClick={() => setIsRegister(false)}>
-              Already have an account? Login
+            
+            <Button text="Create Account" />
+            
+            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400 transition" onClick={() => setIsRegister(false)}>
+              Already have an account? <span className="text-cyan-400 font-bold">Login</span>
             </p>
           </form>
+
         ) : step === 1 ? (
-          // LOGIN FORM
+          // --- LOGIN STEP 1 FORM ---
           <form onSubmit={handleLogin} className="space-y-4">
             <Input icon={<Mail />} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
             <Input icon={<Lock />} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+            
             <Button text="Verify Credentials" />
-            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400" onClick={() => setIsRegister(true)}>
-              New User? Create Account
+            
+            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400 transition" onClick={() => setIsRegister(true)}>
+              New User? <span className="text-cyan-400 font-bold">Create Account</span>
             </p>
           </form>
+
         ) : (
-          // MFA FORM
+          // --- LOGIN STEP 2 FORM (OTP) ---
           <form onSubmit={handleMFA} className="space-y-4">
-            <div className="text-center text-cyan-300 text-sm mb-4">OTP sent to {email}</div>
-            <Input icon={<Shield />} placeholder="Enter OTP" value={otp} onChange={e => setOtp(e.target.value)} autoFocus />
-            <Button text="Authenticate" />
+            <div className="bg-slate-800/50 p-3 rounded-lg text-center border border-slate-700">
+              <p className="text-xs text-slate-400">Code sent to:</p>
+              <p className="text-cyan-400 font-mono text-sm">{email}</p>
+            </div>
+
+            <Input icon={<Shield />} placeholder="Enter 6-digit OTP" value={otp} onChange={e => setOtp(e.target.value)} autoFocus />
+            
+            <Button text="Authenticate Access" />
+            
+            <p className="text-center text-slate-500 text-xs mt-4 cursor-pointer hover:text-white" onClick={() => setStep(1)}>
+              ← Back to Login
+            </p>
           </form>
         )}
+
       </div>
     </div>
   );
 }
 
+// Reusable Components
 function Input({ icon, ...props }) {
   return (
     <div className="relative group">
-      <div className="absolute left-3 top-3 text-slate-500">{icon}</div>
-      <input {...props} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg py-3 pl-10 text-white focus:outline-none focus:border-cyan-500 transition-all" />
+      <div className="absolute left-3 top-3 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+        {icon}
+      </div>
+      <input 
+        {...props} 
+        className="w-full bg-slate-950/50 border border-slate-700 rounded-lg py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all" 
+      />
     </div>
   );
 }
 
 function Button({ text }) {
   return (
-    <button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-lg shadow-lg transition-all">
-      {text}
+    <button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-cyan-900/20 transition-all flex items-center justify-center space-x-2">
+      <span>{text}</span>
+      <ArrowRight size={18} />
     </button>
   );
 }

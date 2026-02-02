@@ -1,30 +1,28 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan'); // Logger
-
-const authRoutes = require('./routes/auth');
-const paperRoutes = require('./routes/papers');
-const adminRoutes = require('./routes/admin');
+require('dotenv').config();
 
 const app = express();
 
 // Middleware
-app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(morgan('dev')); // Log requests to console
 
-// Mount Routes
+// Import Routes
+const authRoutes = require('./routes/auth');
+const paperRoutes = require('./routes/papers');
+const facultyRoutes = require('./routes/faculty'); // Added Faculty
+const adminRoutes = require('./routes/admin');     // Added Admin
+
+// Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/papers', paperRoutes);
+app.use('/api/faculty', facultyRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!', details: err.message });
+// Test Route
+app.get('/', (req, res) => {
+    res.send('ResearchVault Secure API is Running...');
 });
 
 const PORT = process.env.PORT || 5000;
