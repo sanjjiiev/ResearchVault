@@ -3,9 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Layout from './components/Layout';
 import UploadPage from './pages/Upload';
-
-// Placeholder for Dashboard (You can expand this later)
-const Dashboard = () => <div className="text-white text-xl">Welcome to your secure vault.</div>;
+import Dashboard from './pages/Dashboard'; // <--- Import this
 
 function App() {
   return (
@@ -14,9 +12,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         
-        {/* Protected Routes */}
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} /> {/* <--- Use this */}
           <Route path="/upload" element={<UploadPage />} />
         </Route>
 

@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { loginInit, loginVerify } = require('../controllers/authController');
 
-// Route: POST /api/auth/login (Step 1: Password)
+// FIX: Added 'register' to the import list
+const { loginInit, loginVerify, register } = require('../controllers/authController');
+
+// Route: Register new user (Step 0)
+router.post('/register', register);
+
+// Route: Login Step 1 (Password)
 router.post('/login', loginInit);
 
-// Route: POST /api/auth/verify-otp (Step 2: MFA)
+// Route: Login Step 2 (MFA OTP)
 router.post('/verify-otp', loginVerify);
 
 module.exports = router;

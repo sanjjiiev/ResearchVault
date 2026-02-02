@@ -53,3 +53,23 @@ exports.downloadPaper = async (req, res) => {
     res.contentType('application/pdf');
     res.send(decryptedPdf);
 };
+
+
+exports.listPapers = async (req, res) => {
+    try {
+        const { role, id } = req.user;
+        let query = supabase.from('papers').select('*, profiles(full_name)');
+
+        // Access Control: Students see own, Faculty see assigned (mocked as all for now), Admin sees all
+        if (role === 'student') {
+            query = query.eq('author_id', id);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

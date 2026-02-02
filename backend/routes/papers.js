@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { uploadPaper, downloadPaper } = require('../controllers/paperController');
+
+// FIX: Added 'listPapers' to the import list
+const { uploadPaper, downloadPaper, listPapers } = require('../controllers/paperController');
 const { verifyToken } = require('../middleware/authenticate');
 const { checkPermission } = require('../middleware/authorize');
 
@@ -11,7 +13,10 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Upload: Authenticated + Student Role
+// Route: List All Papers (for Dashboard) -> This was the line causing the error
+router.get('/', verifyToken, listPapers); 
+
+// Route: Upload Paper (Student only)
 router.post('/upload', 
     verifyToken, 
     checkPermission('upload_paper'), 
@@ -19,7 +24,7 @@ router.post('/upload',
     uploadPaper
 );
 
-// Download: Authenticated
+// Route: Download Paper
 router.get('/:id/download', 
     verifyToken, 
     downloadPaper 
