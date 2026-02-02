@@ -24,26 +24,26 @@ export default function ReviewModal({ paperId, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-full max-w-lg relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-white">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white border border-slate-200 p-6 rounded-xl w-full max-w-lg relative shadow-2xl">
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
           <X size={20} />
         </button>
         
-        <h2 className="text-xl font-bold text-white mb-4">Submit Review</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Submit Review</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Score (1-10)</label>
-            <input type="number" min="1" max="10" value={score} onChange={(e) => setScore(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:border-cyan-500 outline-none" />
+            <label className="block text-sm text-slate-600 mb-1">Score (1-10)</label>
+            <input type="number" min="1" max="10" value={score} onChange={(e) => setScore(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-slate-900 focus:border-cyan-500 outline-none" />
           </div>
           
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Comments</label>
-            <textarea rows="4" value={comments} onChange={(e) => setComments(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:border-cyan-500 outline-none" placeholder="Enter your detailed review..." required />
+            <label className="block text-sm text-slate-600 mb-1">Comments</label>
+            <textarea rows="4" value={comments} onChange={(e) => setComments(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-slate-900 focus:border-cyan-500 outline-none" placeholder="Enter your detailed review..." required />
           </div>
 
-          <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-lg transition">
+          <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-lg transition shadow-md">
             {loading ? "Submitting..." : "Submit Review"}
           </button>
         </form>

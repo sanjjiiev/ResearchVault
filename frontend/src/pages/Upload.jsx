@@ -36,45 +36,45 @@ export default function UploadPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-white mb-2">Secure Submission</h1>
-      <p className="text-slate-400 mb-8">Files are encrypted client-side via AES-256 before transmission.</p>
+      <h1 className="text-3xl font-bold text-slate-900 mb-2">Secure Submission</h1>
+      <p className="text-slate-500 mb-8">Files are encrypted client-side via AES-256 before transmission.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Form Section */}
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Paper Title</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Paper Title</label>
             <input 
               type="text" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-white border border-slate-300 rounded-lg p-3 text-slate-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Abstract</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Abstract</label>
             <textarea 
               rows="4"
               value={abstract}
               onChange={(e) => setAbstract(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-white border border-slate-300 rounded-lg p-3 text-slate-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
             ></textarea>
           </div>
         </div>
 
         {/* Dropzone Section */}
-        <div className="glass rounded-xl p-8 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-center hover:border-cyan-500/50 transition-colors">
+        <div className="bg-white rounded-xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center hover:border-cyan-500 transition-colors">
           {file ? (
-            <div className="text-cyan-400">
+            <div className="text-cyan-600">
               <File size={48} className="mx-auto mb-4" />
               <p className="font-medium">{file.name}</p>
               <p className="text-sm text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-              <button onClick={() => setFile(null)} className="text-sm text-red-400 mt-2 hover:underline">Remove</button>
+              <button onClick={() => setFile(null)} className="text-sm text-red-500 mt-2 hover:underline">Remove</button>
             </div>
           ) : (
             <>
-              <UploadCloud size={48} className="text-slate-500 mb-4" />
-              <p className="text-lg font-medium text-white">Drag PDF here or click to browse</p>
+              <UploadCloud size={48} className="text-slate-400 mb-4" />
+              <p className="text-lg font-medium text-slate-700">Drag PDF here or click to browse</p>
               <p className="text-sm text-slate-500 mt-2">PDF only. Max 10MB.</p>
               <input 
                 type="file" 
@@ -91,7 +91,7 @@ export default function UploadPage() {
         <button 
           onClick={handleUpload}
           disabled={loading || !file}
-          className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-lg font-bold flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-lg font-bold flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-md shadow-cyan-200"
         >
           {loading ? <Loader2 className="animate-spin" /> : <CheckCircle />}
           <span>{loading ? 'Encrypting & Uploading...' : 'Submit Securely'}</span>

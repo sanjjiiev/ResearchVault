@@ -75,18 +75,18 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-slate-900 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
-      <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
+    <div className="h-screen w-full flex items-center justify-center bg-slate-50">
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
 
-      <div className="relative z-10 w-full max-w-md p-8 glass rounded-2xl shadow-2xl border border-slate-700">
+      <div className="relative z-10 w-full max-w-md p-8 bg-white rounded-2xl shadow-xl border border-slate-100">
         
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="bg-cyan-500/20 p-3 rounded-full w-14 h-14 mx-auto flex items-center justify-center mb-4 text-cyan-400">
+          <div className="bg-cyan-50 p-3 rounded-full w-16 h-16 mx-auto flex items-center justify-center mb-4 text-cyan-600">
             <Shield size={28} />
           </div>
-          <h2 className="text-3xl font-bold text-white">ResearchVault</h2>
-          <p className="text-slate-400 mt-2 text-sm uppercase tracking-widest">
+          <h2 className="text-3xl font-bold text-slate-900">ResearchVault</h2>
+          <p className="text-slate-500 mt-2 text-sm uppercase tracking-widest font-medium">
             {isRegister ? "Create Account" : step === 1 ? "Secure Login" : "Multi-Factor Auth"}
           </p>
         </div>
@@ -101,8 +101,8 @@ export default function Login() {
             
             <Button text="Create Account" />
             
-            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400 transition" onClick={() => setIsRegister(false)}>
-              Already have an account? <span className="text-cyan-400 font-bold">Login</span>
+            <p className="text-center text-slate-500 text-sm mt-4 cursor-pointer hover:text-cyan-600 transition" onClick={() => setIsRegister(false)}>
+              Already have an account? <span className="text-cyan-600 font-bold">Login</span>
             </p>
           </form>
 
@@ -114,24 +114,24 @@ export default function Login() {
             
             <Button text="Verify Credentials" />
             
-            <p className="text-center text-slate-400 text-sm mt-4 cursor-pointer hover:text-cyan-400 transition" onClick={() => setIsRegister(true)}>
-              New User? <span className="text-cyan-400 font-bold">Create Account</span>
+            <p className="text-center text-slate-500 text-sm mt-4 cursor-pointer hover:text-cyan-600 transition" onClick={() => setIsRegister(true)}>
+              New User? <span className="text-cyan-600 font-bold">Create Account</span>
             </p>
           </form>
 
         ) : (
           // --- LOGIN STEP 2 FORM (OTP) ---
           <form onSubmit={handleMFA} className="space-y-4">
-            <div className="bg-slate-800/50 p-3 rounded-lg text-center border border-slate-700">
-              <p className="text-xs text-slate-400">Code sent to:</p>
-              <p className="text-cyan-400 font-mono text-sm">{email}</p>
+            <div className="bg-blue-50 p-3 rounded-lg text-center border border-blue-100">
+              <p className="text-xs text-slate-500">Code sent to:</p>
+              <p className="text-blue-600 font-mono text-sm font-bold">{email}</p>
             </div>
 
             <Input icon={<Shield />} placeholder="Enter 6-digit OTP" value={otp} onChange={e => setOtp(e.target.value)} autoFocus />
             
             <Button text="Authenticate Access" />
             
-            <p className="text-center text-slate-500 text-xs mt-4 cursor-pointer hover:text-white" onClick={() => setStep(1)}>
+            <p className="text-center text-slate-400 text-xs mt-4 cursor-pointer hover:text-slate-600" onClick={() => setStep(1)}>
               ← Back to Login
             </p>
           </form>
@@ -146,12 +146,12 @@ export default function Login() {
 function Input({ icon, ...props }) {
   return (
     <div className="relative group">
-      <div className="absolute left-3 top-3 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+      <div className="absolute left-3 top-3 text-slate-400 group-focus-within:text-cyan-600 transition-colors">
         {icon}
       </div>
       <input 
         {...props} 
-        className="w-full bg-slate-950/50 border border-slate-700 rounded-lg py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all" 
+        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-10 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all" 
       />
     </div>
   );
@@ -159,7 +159,7 @@ function Input({ icon, ...props }) {
 
 function Button({ text }) {
   return (
-    <button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-cyan-900/20 transition-all flex items-center justify-center space-x-2">
+    <button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-cyan-200 transition-all flex items-center justify-center space-x-2">
       <span>{text}</span>
       <ArrowRight size={18} />
     </button>

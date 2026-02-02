@@ -57,7 +57,6 @@ exports.downloadPaper = async (req, res) => {
 
 exports.listPapers = async (req, res) => {
     try {
-        const { role, id } = req.user;
         const { mode } = req.query;
 
         // Public/Homepage View: List only accepted papers
@@ -65,11 +64,13 @@ exports.listPapers = async (req, res) => {
             const { data, error } = await supabase
                 .from('papers')
                 .select('*, profiles(full_name)')
-                .eq('status', 'accepted');
+                .eq('status', 'accepted')
+                .order('created_at', { ascending: false });
             if (error) throw error;
             return res.json(data);
         }
 
+        const { role, id } = req.user;
         let query = supabase.from('papers').select('*, profiles(full_name)');
 
         // Access Control: Students see own, Faculty see assigned (mocked as all for now), Admin sees all

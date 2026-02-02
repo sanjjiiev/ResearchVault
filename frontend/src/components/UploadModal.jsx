@@ -34,20 +34,20 @@ export default function UploadModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-full max-w-lg relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X size={20} /></button>
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white border border-slate-200 p-6 rounded-xl w-full max-w-lg relative shadow-2xl">
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X size={20} /></button>
         
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><UploadCloud className="text-cyan-400" /> Upload Research</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2"><UploadCloud className="text-cyan-600" /> Upload Research</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" placeholder="Paper Title" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:border-cyan-500 outline-none" required />
-          <textarea placeholder="Abstract" rows="3" value={abstract} onChange={e => setAbstract(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:border-cyan-500 outline-none" required />
-          <div className="border-2 border-dashed border-slate-700 rounded-lg p-8 text-center hover:border-cyan-500/50 transition cursor-pointer relative">
+          <input type="text" placeholder="Paper Title" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:border-cyan-500 outline-none" required />
+          <textarea placeholder="Abstract" rows="3" value={abstract} onChange={e => setAbstract(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:border-cyan-500 outline-none" required />
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-cyan-500 transition cursor-pointer relative">
             <input type="file" accept="application/pdf" onChange={e => setFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
             <p className="text-slate-400 text-sm">{file ? file.name : "Drop PDF here or click to browse"}</p>
           </div>
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-lg transition">{loading ? "Encrypting & Uploading..." : "Secure Upload"}</button>
+          <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg transition shadow-md">{loading ? "Encrypting & Uploading..." : "Secure Upload"}</button>
         </form>
       </div>
     </div>
