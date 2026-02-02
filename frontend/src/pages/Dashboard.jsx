@@ -77,6 +77,24 @@ export default function Dashboard() {
                <span className="ml-auto text-cyan-500">Author: {paper.profiles?.full_name || 'Unknown'}</span>
             </div>
 
+            {/* Admin View: Show Reviews */}
+            {userRole === 'admin' && paper.reviews && paper.reviews.length > 0 && (
+              <div className="mb-4 bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                <h4 className="text-xs font-bold text-slate-300 mb-2 uppercase tracking-wider">Faculty Reviews</h4>
+                <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                  {paper.reviews.map((review) => (
+                    <div key={review.id} className="text-xs text-slate-400 border-b border-slate-800 last:border-0 pb-2">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-cyan-400 font-medium">{review.profiles?.full_name || 'Faculty'}</span>
+                        <span className={`font-bold ${review.score >= 7 ? 'text-green-400' : 'text-yellow-400'}`}>Score: {review.score}/10</span>
+                      </div>
+                      <p className="italic opacity-80">"{review.comments}"</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Actions Footer */}
             <div className="mt-auto pt-4 border-t border-slate-800 space-y-3">
               

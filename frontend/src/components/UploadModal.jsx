@@ -26,7 +26,7 @@ export default function UploadModal({ onClose, onSuccess }) {
       toast.success("Paper uploaded securely!");
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch  {
       toast.error("Upload failed");
     } finally {
       setLoading(false);

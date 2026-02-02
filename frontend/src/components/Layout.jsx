@@ -1,8 +1,9 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, FileText, Upload, LogOut } from 'lucide-react';
+import { ShieldCheck, LayoutDashboard, Upload, LogOut, BookOpen } from 'lucide-react';
 
 export default function Layout() {
   const navigate = useNavigate();
+  const role = localStorage.getItem('role') || 'student';
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -20,8 +21,11 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 px-4 space-y-4 mt-8">
-          <NavLink to="/dashboard" icon={<FileText />} label="My Papers" />
-          <NavLink to="/upload" icon={<Upload />} label="Secure Upload" />
+          <NavLink to="/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
+          <NavLink to="/accepted" icon={<BookOpen />} label="Published Research" />
+          {role === 'student' && (
+            <NavLink to="/upload" icon={<Upload />} label="Secure Upload" />
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-800">

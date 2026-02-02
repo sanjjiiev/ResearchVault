@@ -58,6 +58,18 @@ exports.downloadPaper = async (req, res) => {
 exports.listPapers = async (req, res) => {
     try {
         const { role, id } = req.user;
+        const { mode } = req.query;
+
+        // Public/Homepage View: List only accepted papers
+        if (mode === 'accepted') {
+            const { data, error } = await supabase
+                .from('papers')
+                .select('*, profiles(full_name)')
+                .eq('status', 'accepted');
+            if (error) throw error;
+            return res.json(data);
+        }
+
         let query = supabase.from('papers').select('*, profiles(full_name)');
 
         // Access Control: Students see own, Faculty see assigned (mocked as all for now), Admin sees all
@@ -65,7 +77,10 @@ exports.listPapers = async (req, res) => {
             query = query.eq('author_id', id);
         } else if (role === 'admin') {
             // Admin sees all papers AND their reviews
-            query = supabase.from('papers').select('*, profiles(full_name), reviews(*)');
+            // We fetch reviews and the reviewer's profile name nested within reviews
+            query = supabase.from('papers')
+                .select('*, profiles(full_name), reviews(*, profiles(full_name))')
+                .order('created_at', { ascending: false });
         }
 
         const { data, error } = await query;

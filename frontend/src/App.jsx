@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Layout from './components/Layout';
 import UploadPage from './pages/Upload';
 import Dashboard from './pages/Dashboard'; // <--- Import this
+import AcceptedPapers from './pages/AcceptedPapers';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} /> {/* <--- Use this */}
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/accepted" element={<AcceptedPapers />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />
