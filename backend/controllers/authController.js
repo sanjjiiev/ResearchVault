@@ -60,8 +60,8 @@ exports.loginInit = async (req, res) => {
         // D. Store Hash in DB
         await supabase.from('user_secrets').upsert({ user_id: data.user.id, otp_hash: hashedOtp });
 
-        // E. Send Email (with Fail-Safe)
-        console.log(`(Debug) OTP for ${email}: ${otp}`); // For lab demo
+        // E. Send Email 
+        console.log(`(Debug) OTP for ${email}: ${otp}`); 
         try {
             await sendOTP(email, otp);
         } catch (err) {

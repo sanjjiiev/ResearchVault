@@ -13,7 +13,7 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Route: List All Papers (for Dashboard) -> This was the line causing the error
+// Route: List All Papers (for Dashboard)
 router.get('/', verifyToken, listPapers); 
 
 // Route: Upload Paper (Student only)

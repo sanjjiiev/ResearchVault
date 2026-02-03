@@ -11,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [papers, setPapers] = useState([]);
   
-  // FIX 1: Initialize role directly from localStorage to prevent cascading renders
+  // Initialize role directly from localStorage to prevent cascading renders
   const [userRole] = useState(() => localStorage.getItem('role') || 'student');
   
   const [selectedPaper, setSelectedPaper] = useState(null); 
@@ -28,7 +28,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  // FIX 2: useEffect now only handles data fetching, not role setting
+  // useEffect now only handles data fetching, not role setting
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPapers();

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import api from '../api';
 
 export default function Login() {
-  const [isRegister, setIsRegister] = useState(false); // Toggle Login/Register
+  const [isRegister, setIsRegister] = useState(false); 
   const [step, setStep] = useState(1); 
   
   // Form States

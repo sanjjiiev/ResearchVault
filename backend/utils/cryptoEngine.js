@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 // FIX: Import keys from the central config instead of generating them here.
-// This prevents the "EEXIST" (Folder already exists) crash.
 const { publicKey, privateKey } = require('../config/keys');
 
 // --- 1. AES Encryption (Symmetric) for Files ---

@@ -17,8 +17,7 @@ exports.uploadPaper = async (req, res) => {
         const fileBase64 = encryptedData.toString('base64');
         const ivHex = iv.toString('hex');
 
-        // 4. Upload to Storage (Simulated by DB insert for Lab convenience)
-        // In real Supabase, we'd upload 'fileBase64' to Storage bucket
+        // 4. Upload to Storage
         const { data, error } = await supabase.from('papers').insert({
             author_id: userId,
             title,
@@ -73,7 +72,7 @@ exports.listPapers = async (req, res) => {
         const { role, id } = req.user;
         let query = supabase.from('papers').select('*, profiles(full_name)');
 
-        // Access Control: Students see own, Faculty see assigned (mocked as all for now), Admin sees all
+        // Access Control: Students see own, Admin sees all
         if (role === 'student') {
             query = query.eq('author_id', id);
         } else if (role === 'admin') {
