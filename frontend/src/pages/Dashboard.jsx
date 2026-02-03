@@ -1,11 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FileText, Download, Clock, PenTool, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { FileText, Download, Clock, PenTool, Plus, LogOut } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../api';
 import ReviewModal from '../components/ReviewModal';
 import AdminControls from '../components/AdminControls';
 import UploadModal from '../components/UploadModal';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [papers, setPapers] = useState([]);
   
   // FIX 1: Initialize role directly from localStorage to prevent cascading renders
@@ -21,6 +24,7 @@ export default function Dashboard() {
       setPapers(res.data);
     } catch (err) {
       console.error("Failed to fetch papers", err);
+      toast.error("Failed to load papers. Please check database connections.");
     }
   }, []);
 
@@ -44,18 +48,31 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/');
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-slate-900">
           {userRole === 'admin' ? 'Admin Control Center' : userRole === 'faculty' ? 'Review Dashboard' : 'My Research'}
         </h1>
-        {userRole === 'student' && (
-          <button onClick={() => setShowUpload(true)} className="flex items-center space-x-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg transition shadow-md shadow-cyan-200">
-            <Plus size={20} />
-            <span>Upload Paper</span>
+        
+        <div className="flex items-center gap-3">
+          {userRole === 'student' && (
+            <button onClick={() => setShowUpload(true)} className="flex items-center space-x-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg transition shadow-md shadow-cyan-200">
+              <Plus size={20} />
+              <span>Upload Paper</span>
+            </button>
+          )}
+          <button onClick={handleLogout} className="flex items-center space-x-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg transition">
+            <LogOut size={20} />
+            <span>Logout</span>
           </button>
-        )}
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

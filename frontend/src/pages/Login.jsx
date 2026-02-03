@@ -24,8 +24,17 @@ export default function Login() {
   // Handle Registration
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (!fullName.trim()) return toast.error("Full Name is required");
+    if (!email.trim()) return toast.error("University Email is required");
+
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+      return toast.error("Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.");
+    }
+
     try {
-      await api.post('/auth/register', { email, password, full_name: fullName });
+      await api.post('/auth/register', { email: email.trim(), password, full_name: fullName.trim() });
       toast.success("Account created! Please login.");
       setIsRegister(false);
     } catch (err) {

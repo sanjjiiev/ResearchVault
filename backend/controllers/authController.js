@@ -6,6 +6,10 @@ const { sendOTP } = require('../utils/emailService');
 exports.register = async (req, res) => {
     const { email, password, full_name, role } = req.body;
 
+    if (!email || !password || !full_name) {
+        return res.status(400).json({ error: "Full name, email, and password are required." });
+    }
+
     // Create user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({
         email,
@@ -16,7 +20,16 @@ exports.register = async (req, res) => {
         }
     });
 
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+        console.error("Supabase Auth Error:", error);
+        // Handle Database Trigger Failures (Status 500 from Supabase)
+        if (error.status === 500 || error.code === 'unexpected_failure') {
+            return res.status(500).json({ 
+                error: "Database error: The 'profiles' table or trigger is missing/broken in Supabase." 
+            });
+        }
+        return res.status(400).json({ error: error.message });
+    }
 
     res.json({ message: 'Registration successful! Please log in.' });
 };

@@ -89,6 +89,7 @@ exports.listPapers = async (req, res) => {
         
         res.json(data);
     } catch (err) {
+        console.error("Error in listPapers:", err);
         res.status(500).json({ error: err.message });
     }
 };
