@@ -180,6 +180,5 @@ By default, all new registrations are assigned the **Student** role. To create p
 2. **Faculty:** Login (after promoting the user). Click "Submit Review" on a paper. Fill out the score and comments.
 3. **Admin:** Login (after promoting the user). Click "Read Reviews" to see the faculty feedback. Click "Accept" or "Reject" to finalize the paper.
 
-## License
 
-This project is open-source and available for educational purposes.
+This project is available for educational purposes.
